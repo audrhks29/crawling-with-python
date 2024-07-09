@@ -34,18 +34,23 @@ for ad_element in ad_elements:
   driver.execute_script("arguments[0].parentNode.removeChild(arguments[0]);", ad_element)
 
 # 스킬 탭 클릭(카테고리 선택)
-WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#container2 > div:nth-child(6) > div:nth-child(4) > div:nth-child(3) > a'))).click()
+sleep(5)
+WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#container2 > div:nth-child(6) > div:nth-child(3) > div:nth-child(1) > a'))).click()
 
 # 랭크 선택
 skills=driver.find_elements(By.CSS_SELECTOR, '.skill')
 
 skills_data = []
+skills_index=0
 
 for skill in skills:
   skill_rank = skill.find_element(By.CSS_SELECTOR, '.skill_data')
   skill_effect= skill.find_element(By.CSS_SELECTOR, '.icon').click()
-    
-  for rank_value in range(0, 16):
+  skill_rank_option = skill.find_elements(By.CSS_SELECTOR, 'option')
+  skill_rank_option_length=len(skill_rank_option)
+  print(skill_rank_option_length)
+  
+  for rank_value in range(0, skill_rank_option_length):
     select_element = Select(skill_rank)
     select_element.select_by_value(str(rank_value))
 
@@ -73,7 +78,7 @@ for skill in skills:
     )
     driver.switch_to.frame(iframe)
 
-    for table_id in range(0,16):
+    for table_id in range(0,skill_rank_option_length):
       try:
         table_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, str(table_id)))
@@ -85,8 +90,8 @@ for skill in skills:
         lines = [line.strip() for line in soup.stripped_strings if line.strip()]
       
         for line in lines:
-          skills_data[int(table_id)]['effect'] = lines
-        
+          skills_data[skills_index]['effect'] = lines
+          skills_index += 1
         
         # for line in lines:
         #   print(lines)
@@ -98,11 +103,9 @@ for skill in skills:
     driver.switch_to.default_content()
     
 print(skills_data)
-      # driver.quit()
-
-
+      
 # 수집한 데이터를 데이터 프레임으로 변환
-# df = pd.DataFrame(skills_data)
+df = pd.DataFrame(skills_data)
 
 # 엑셀 파일로 저장
-# df.to_excel("skills_data.xlsx", index=False)
+df.to_excel("skills_data.xlsx", index=False)

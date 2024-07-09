@@ -34,7 +34,6 @@ for ad_element in ad_elements:
   driver.execute_script("arguments[0].parentNode.removeChild(arguments[0]);", ad_element)
 
 # 스킬 탭 클릭(카테고리 선택)
-sleep(5)
 WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#container2 > div:nth-child(6) > div:nth-child(3) > div:nth-child(1) > a'))).click()
 
 # 랭크 선택
@@ -46,9 +45,10 @@ skills_index=0
 for skill in skills:
   skill_rank = skill.find_element(By.CSS_SELECTOR, '.skill_data')
   skill_effect= skill.find_element(By.CSS_SELECTOR, '.icon').click()
+  
+  # 랭크 길이
   skill_rank_option = skill.find_elements(By.CSS_SELECTOR, 'option')
   skill_rank_option_length=len(skill_rank_option)
-  print(skill_rank_option_length)
   
   for rank_value in range(0, skill_rank_option_length):
     select_element = Select(skill_rank)
@@ -89,12 +89,8 @@ for skill in skills:
         soup = BeautifulSoup(html_content, 'html.parser')
         lines = [line.strip() for line in soup.stripped_strings if line.strip()]
       
-        for line in lines:
-          skills_data[skills_index]['effect'] = lines
-          skills_index += 1
-        
-        # for line in lines:
-        #   print(lines)
+        skills_data[skills_index]['effect'] = lines
+        skills_index += 1
           
       except Exception as e:
         print(f"Table ID {table_id} not found or error occurred: {e}")
@@ -102,8 +98,10 @@ for skill in skills:
   finally:
     driver.switch_to.default_content()
     
-print(skills_data)
-      
+# print(skills_data)
+# for s in skills_data:
+#   print(s)
+
 # 수집한 데이터를 데이터 프레임으로 변환
 df = pd.DataFrame(skills_data)
 

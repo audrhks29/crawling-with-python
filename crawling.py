@@ -8,7 +8,7 @@ from selenium.webdriver import ActionChains
 import pandas as pd
 from time import sleep
 from bs4 import BeautifulSoup
-
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 # 브라우저 꺼짐 방지 옵션
 chrome_options = Options()
 chrome_options.add_experimental_option("detach", True)
@@ -17,7 +17,6 @@ driver = webdriver.Chrome(options=chrome_options)
 
 # 웹페이지 해당 주소 이동
 driver.get("https://mabi.tar.to/")
-
 
 act = ActionChains(driver)  # 드라이버에 동작을 실행시키는 명령어를 act로 지정
 
@@ -28,13 +27,16 @@ act_input_nickName = driver.find_element(By.CSS_SELECTOR, '#loginForm > input').
 act_click_search = driver.find_element(By.CSS_SELECTOR, '#loginForm > button').click()
 
 # 광고 요소 제거
-ad_elements = driver.find_elements(By.CSS_SELECTOR, '[id^="google_ads"], .adsbygoogle, .ad-container')
-
-for ad_element in ad_elements:
-  driver.execute_script("arguments[0].parentNode.removeChild(arguments[0]);", ad_element)
-
+# WebDriverWait(driver, 10).until(
+#   EC.presence_of_element_located((By.CSS_SELECTOR, '[id^="google_ads"], .adsbygoogle, .ad-container'))
+# )
+# ad_elements = driver.find_elements(By.CSS_SELECTOR, '[id^="google_ads"], .adsbygoogle, .ad-container')
+# for ad_element in ad_elements:
+#   driver.execute_script("arguments[0].parentNode.removeChild(arguments[0]);", ad_element)
+    
 # 스킬 탭 클릭(카테고리 선택)
-WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#container2 > div:nth-child(6) > div:nth-child(3) > div:nth-child(1) > a'))).click()
+driver.find_element(By.CSS_SELECTOR, '#container2 > div:nth-child(6) > div:nth-child(4) > div:nth-child(11) > a').click()
+# WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#container2 > div:nth-child(6) > div:nth-child(3) > div:nth-child(1) > a'))).click()
 
 # 랭크 선택
 skills=driver.find_elements(By.CSS_SELECTOR, '.skill')
